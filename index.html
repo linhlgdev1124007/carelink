@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CareLink - Điều phối thiện nguyện thông minh</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#dashboard" aria-label="CareLink">
+        <span class="brand-mark">CL</span>
+        <span>
+          <strong>CareLink</strong>
+          <small>Điều phối nguồn lực</small>
+        </span>
+      </a>
+
+      <nav class="nav-list" aria-label="Điều hướng chính">
+        <a class="nav-item active" href="#dashboard" data-view="dashboard">Bảng điều khiển</a>
+        <a class="nav-item" href="#map" data-view="map">Bản đồ nhu cầu</a>
+        <a class="nav-item" href="#needs" data-view="needs">Đăng nhu cầu</a>
+        <a class="nav-item" href="#matching" data-view="matching">AI kết nối</a>
+        <a class="nav-item" href="#donations" data-view="donations">Quyên góp</a>
+        <a class="nav-item" href="#volunteers" data-view="volunteers">Tình nguyện viên</a>
+        <a class="nav-item" href="#logistics" data-view="logistics">Vận chuyển</a>
+        <a class="nav-item" href="#transparency" data-view="transparency">Minh bạch</a>
+        <a class="nav-item" href="#admin" data-view="admin">Kiểm duyệt</a>
+        <a class="nav-item" href="#impact" data-view="impact">Tác động xã hội</a>
+      </nav>
+
+      <div class="sidebar-note">
+        <span class="dot dot-live"></span>
+        Dữ liệu cập nhật mỗi 4 phút
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="mobile-menu" type="button" aria-label="Mở điều hướng">Trình đơn</button>
+        <div>
+          <p class="eyebrow">Từ nhu cầu đến hỗ trợ</p>
+          <h1>Kết nối đúng nguồn lực với đúng nơi cần, đúng thời điểm.</h1>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn btn-ghost" type="button" id="refreshBtn">Cập nhật</button>
+          <button class="btn btn-secondary" type="button" data-open-modal="helpModal">Tôi đang cần hỗ trợ</button>
+          <button class="btn btn-primary" type="button" data-open-modal="donateModal">Tôi muốn hỗ trợ</button>
+        </div>
+      </header>
+
+      <section class="notification-strip" aria-live="polite">
+        <div class="notice strong">Cần xử lý: 3 yêu cầu khẩn cấp trong 24h tới</div>
+        <div class="notice">12 tình nguyện viên phù hợp vừa được gợi ý</div>
+        <div class="notice">Chuyến xe CL-204 đã giao hàng tại Hòa Vang</div>
+      </section>
+
+      <section id="dashboard" class="view active-view">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Tổng quan điều phối</p>
+            <h2>Bảng điều khiển hệ thống</h2>
+          </div>
+          <div class="segmented" role="tablist" aria-label="Lọc thời gian">
+            <button class="segment active" type="button">Hôm nay</button>
+            <button class="segment" type="button">7 ngày</button>
+            <button class="segment" type="button">30 ngày</button>
+          </div>
+        </div>
+
+        <div class="metric-grid">
+          <article class="metric-card"><span>Chiến dịch đang chạy</span><strong>18</strong><small>+4 chiến dịch mới</small></article>
+          <article class="metric-card"><span>Tiền quyên góp</span><strong>2,84 tỷ</strong><small>86% đã phân bổ</small></article>
+          <article class="metric-card"><span>Vật phẩm tiếp nhận</span><strong>43.620</strong><small>12 nhóm nguồn lực</small></article>
+          <article class="metric-card"><span>Người cần hỗ trợ</span><strong>27.450</strong><small>5 tỉnh/thành</small></article>
+          <article class="metric-card"><span>Tình nguyện viên hoạt động</span><strong>1.284</strong><small>312 có phương tiện</small></article>
+          <article class="metric-card"><span>Chuyến vận chuyển</span><strong>64</strong><small>21 đang thực hiện</small></article>
+          <article class="metric-card"><span>Người đã hỗ trợ</span><strong>19.870</strong><small>72% tiến độ</small></article>
+          <article class="metric-card"><span>Hồ sơ cần kiểm tra</span><strong>9</strong><small>AI gắn cờ bất thường</small></article>
+        </div>
+
+        <div class="dashboard-grid">
+          <section class="panel urgent-panel">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Ưu tiên cao</p>
+                <h3>Những nơi đang cần hỗ trợ ngay</h3>
+              </div>
+              <button class="btn btn-small" type="button" data-view-jump="map">Xem bản đồ</button>
+            </div>
+            <div class="need-list" id="urgentNeeds"></div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">AI ưu tiên</p>
+                <h3>Phân tích ưu tiên</h3>
+              </div>
+              <span class="badge badge-red">92/100</span>
+            </div>
+            <div class="ai-score">
+              <div class="score-ring"><span>92</span></div>
+              <div>
+                <h4>Điểm cứu trợ Hòa Vang</h4>
+                <p>2.000 người bị ảnh hưởng, thiếu nước sạch và thực phẩm trong 36 giờ tiếp theo. Kho gần nhất còn 420 thùng nước, có 6 xe tải nhỏ sẵn sàng.</p>
+              </div>
+            </div>
+            <div class="reason-list">
+              <span>Thiếu hụt 78%</span>
+              <span>Thời hạn gần</span>
+              <span>Đã xác minh</span>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section id="map" class="view">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Bản đồ tương tác</p>
+            <h2>Bản đồ nhu cầu thiện nguyện</h2>
+          </div>
+          <div class="filter-row">
+            <select id="priorityFilter" aria-label="Lọc mức độ">
+              <option value="all">Tất cả mức độ</option>
+              <option value="critical">Khẩn cấp</option>
+              <option value="high">Cao</option>
+              <option value="medium">Trung bình</option>
+              <option value="low">Thấp</option>
+            </select>
+            <button class="btn btn-primary" type="button" data-open-modal="helpModal">Đăng nhu cầu</button>
+          </div>
+        </div>
+
+        <div class="map-layout">
+          <section class="map-panel" aria-label="Bản đồ Việt Nam">
+            <img class="vietnam-map" src="bd.png" alt="Bản đồ Việt Nam">
+            <div id="mapPins"></div>
+          </section>
+          <aside class="panel map-detail" id="mapDetail"></aside>
+        </div>
+      </section>
+
+      <section id="needs" class="view">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Tạo yêu cầu</p>
+            <h2>Đăng nhu cầu hỗ trợ</h2>
+          </div>
+          <span class="status-flow">Chờ xác minh → Đã xác minh → Đang tiếp nhận → Đang thực hiện → Hoàn thành</span>
+        </div>
+
+        <div class="form-layout">
+          <form class="panel form-panel" id="needForm">
+            <div class="form-grid">
+              <label>Tên yêu cầu<input required name="title" placeholder="Ví dụ: Nước sạch cho Hòa Vang"></label>
+              <label>Địa điểm<input required name="location" placeholder="Huyện, tỉnh/thành"></label>
+              <label>Đối tượng cần hỗ trợ<input name="audience" placeholder="Hộ dân bị ảnh hưởng, trẻ em..."></label>
+              <label>Số lượng người<input type="number" name="people" placeholder="2000"></label>
+              <label>Loại nguồn lực
+                <select name="resource">
+                  <option>Nước uống</option>
+                  <option>Thực phẩm</option>
+                  <option>Thuốc và vật dụng y tế</option>
+                  <option>Quần áo</option>
+                  <option>Tình nguyện viên</option>
+                  <option>Phương tiện vận chuyển</option>
+                </select>
+              </label>
+              <label>Số lượng cần<input name="quantity" placeholder="500 thùng"></label>
+              <label>Thời hạn<input type="date" name="deadline"></label>
+              <label>Mức độ khẩn cấp
+                <select name="urgency">
+                  <option>Khẩn cấp</option>
+                  <option>Cao</option>
+                  <option>Trung bình</option>
+                  <option>Thấp</option>
+                </select>
+              </label>
+            </div>
+            <label>Mô tả<textarea name="description" rows="5" placeholder="Mô tả tình hình, bằng chứng, đầu mối phụ trách..."></textarea></label>
+            <div class="upload-box">
+              <strong>Tải lên tài liệu xác minh</strong>
+              <span>Hình ảnh hiện trường, giấy xác nhận, hóa đơn, báo cáo địa phương</span>
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-ghost" type="reset">Làm mới</button>
+              <button class="btn btn-primary" type="submit">Gửi xác minh</button>
+            </div>
+          </form>
+
+          <aside class="panel">
+            <p class="eyebrow">AI đánh giá trước</p>
+            <h3>Điểm ưu tiên tạm tính</h3>
+            <div class="priority-preview"><strong id="priorityPreview">86</strong><span>/100</span></div>
+            <p>Hệ thống sẽ tính điểm dựa trên số người bị ảnh hưởng, loại nhu cầu, mức độ thiếu hụt, khoảng cách kho hàng và thời gian còn lại.</p>
+            <div class="trust-stack">
+              <span class="badge badge-green">Cần bằng chứng rõ ràng</span>
+              <span class="badge badge-amber">Cần đầu mối địa phương</span>
+              <span class="badge badge-blue">Có thể nhận hỗ trợ ngay sau xác minh</span>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section id="matching" class="view">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">AI kết nối nguồn lực</p>
+            <h2>Kết nối nguồn lực phù hợp</h2>
+          </div>
+          <button class="btn btn-secondary" type="button" id="simulateLoading">Chạy gợi ý</button>
+        </div>
+
+        <div class="matching-layout">
+          <section class="panel">
+            <label class="resource-input">Nguồn lực bạn có
+              <textarea id="resourceText" rows="6">Tôi có 100 thùng nước uống và 1 xe bán tải có thể giao trong bán kính 15km.</textarea>
+            </label>
+            <div class="slider-row">
+              <label>Bán kính: <strong id="radiusValue">15km</strong></label>
+              <input id="radiusSlider" type="range" min="5" max="80" value="15">
+            </div>
+            <button class="btn btn-primary full" type="button" id="matchBtn">Tìm nơi cần hỗ trợ</button>
+          </section>
+          <section class="panel">
+            <div class="panel-head">
+              <h3>Đề xuất phù hợp</h3>
+              <span class="badge badge-blue">3 kết quả</span>
+            </div>
+            <div id="matchResults" class="match-results"></div>
+          </section>
+        </div>
+      </section>
+
+      <section id="donations" class="view">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Quyên góp và theo dõi</p>
+            <h2>Quản lý quyên góp</h2>
+          </div>
+          <button class="btn btn-primary" type="button" data-open-modal="donateModal">Tạo đóng góp mới</button>
+        </div>
+
+        <div class="donation-grid">
+          <section class="panel">
+            <div class="panel-head">
+              <h3>Đóng góp gần đây</h3>
+              <span class="badge badge-green">Đã xác minh</span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Mã</th><th>Loại</th><th>Chiến dịch</th><th>Trạng thái</th><th>Giá trị</th></tr></thead>
+                <tbody id="donationRows"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <h3>Hành trình mã CL-DN-4821</h3>
+              <button class="btn btn-small" type="button" data-open-modal="confirmModal">Xác nhận nhận báo cáo</button>
+            </div>
+            <ol class="timeline">
+              <li class="done"><span>Đã quyên góp</span><small>09:12, 04/09</small></li>
+              <li class="done"><span>Đã tiếp nhận</span><small>Kho Đà Nẵng</small></li>
+              <li class="done"><span>Đã xác minh</span><small>Chứng từ hợp lệ</small></li>
+              <li class="done"><span>Đã phân bổ</span><small>Điểm Hòa Vang</small></li>
+              <li class="active"><span>Đang vận chuyển</span><small>Dự kiến 42 phút</small></li>
+              <li><span>Đã giao</span><small>Chờ xác nhận</small></li>
+              <li><span>Đã xác nhận</span><small>Báo cáo tác động</small></li>
+            </ol>
+          </section>
+        </div>
+      </section>
+
+      <section id="volunteers" class="view">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Nhân lực và kỹ năng</p>
+            <h2>Quản lý tình nguyện viên</h2>
+          </div>
+          <button class="btn btn-secondary" type="button">Mời tham gia nhiệm vụ</button>
+        </div>
+        <div class="volunteer-grid" id="volunteerCards"></div>
+      </section>
+
+      <section id="logistics" class="view">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Điều phối vận chuyển</p>
+            <h2>Tuyến hàng đang thực hiện</h2>
+          </div>
+          <span class="badge badge-amber">21 chuyến đang chạy</span>
+        </div>
+        <div class="route-grid" id="routeCards"></div>
+      </section>
+
+      <section id="transparency" class="view">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Tài chính rõ ràng</p>
+            <h2>Trang minh bạch chiến dịch</h2>
+          </div>
+          <button class="btn btn-ghost" type="button">Tải báo cáo PDF</button>
+        </div>
+
+        <div class="transparency-layout">
+          <section class="panel money-panel">
+            <h3>Cứu trợ mưa lũ miền Trung</h3>
+            <div class="money-total">100.000.000đ</div>
+            <p>Tổng tiền đã nhận từ 1.842 người đóng góp.</p>
+            <div class="money-bars">
+              <div><span style="width:60%"></span><label>60.000.000đ mua thực phẩm</label></div>
+              <div><span style="width:20%"></span><label>20.000.000đ mua nước</label></div>
+              <div><span style="width:10%"></span><label>10.000.000đ vận chuyển</label></div>
+              <div><span style="width:10%"></span><label>10.000.000đ còn lại</label></div>
+            </div>
+          </section>
+          <section class="panel">
+            <h3>Chứng từ mới nhất</h3>
+            <div class="doc-list">
+              <div><strong>Hóa đơn thực phẩm #HD-882</strong><span>Đã đối chiếu - 60.000.000đ</span></div>
+              <div><strong>Biên bản bàn giao Hòa Vang</strong><span>1.200 suất ăn, 500 thùng nước</span></div>
+              <div><strong>Xác nhận địa phương</strong><span>Ủy ban xã ký số</span></div>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section id="admin" class="view">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Tin cậy và an toàn</p>
+            <h2>Xác minh và phát hiện bất thường</h2>
+          </div>
+          <span class="badge badge-red">5 cần kiểm tra thủ công</span>
+        </div>
+        <div class="admin-grid">
+          <section class="panel">
+            <h3>Hàng đợi xác minh</h3>
+            <div id="verificationQueue" class="queue-list"></div>
+          </section>
+          <section class="panel">
+            <h3>AI gắn cờ bất thường</h3>
+            <div class="alert-list">
+              <div><strong>Yêu cầu trùng lặp</strong><span>2 hồ sơ cùng địa chỉ và ảnh hiện trường tương tự 94%</span></div>
+              <div><strong>Số liệu tăng đột biến</strong><span>Lượng vật phẩm cần cao gấp 4,6 lần trung bình khu vực</span></div>
+              <div><strong>Tài khoản tạo nhiều yêu cầu</strong><span>7 yêu cầu trong 2 giờ, cần đối chiếu thủ công</span></div>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section id="impact" class="view">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Tác động xã hội</p>
+            <h2>Bảng điều khiển tác động xã hội</h2>
+          </div>
+          <select aria-label="Chọn chiến dịch">
+            <option>Cứu trợ mưa lũ miền Trung</option>
+            <option>Bếp ăn 0 đồng quận 8</option>
+          </select>
+        </div>
+        <div class="impact-grid">
+          <article class="metric-card"><span>Người được hỗ trợ</span><strong>19.870</strong><small>7.120 hộ gia đình</small></article>
+          <article class="metric-card"><span>Giờ tình nguyện</span><strong>8.420</strong><small>1.284 tình nguyện viên</small></article>
+          <article class="metric-card"><span>Vật phẩm phân phối</span><strong>43.620</strong><small>98% đã xác nhận</small></article>
+          <article class="metric-card"><span>Yêu cầu hoàn thành</span><strong>126</strong><small>14 yêu cầu còn mở</small></article>
+        </div>
+        <section class="panel">
+          <h3>Phân bổ tác động theo nguồn lực</h3>
+          <div class="impact-chart" aria-label="Biểu đồ tác động">
+            <div style="height:82%"><span>Thực phẩm</span></div>
+            <div style="height:64%"><span>Nước</span></div>
+            <div style="height:48%"><span>Y tế</span></div>
+            <div style="height:38%"><span>Quần áo</span></div>
+            <div style="height:52%"><span>Tình nguyện</span></div>
+            <div style="height:31%"><span>Vận chuyển</span></div>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <div class="modal" id="donateModal" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="donateTitle">
+      <button class="modal-close" type="button" data-close-modal aria-label="Đóng">×</button>
+      <p class="eyebrow">Đóng góp mới</p>
+      <h2 id="donateTitle">Tôi muốn hỗ trợ</h2>
+      <form id="donateForm">
+        <label>Hình thức
+          <select>
+            <option>Tiền mặt / chuyển khoản</option>
+            <option>Hiện vật</option>
+            <option>Thời gian / kỹ năng</option>
+            <option>Phương tiện vận chuyển</option>
+          </select>
+        </label>
+        <label>Nội dung đóng góp<input placeholder="100 thùng nước uống"></label>
+        <label>Chiến dịch<input placeholder="Cứu trợ mưa lũ miền Trung"></label>
+        <button class="btn btn-primary full" type="submit">Gửi đóng góp</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="helpModal" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+      <button class="modal-close" type="button" data-close-modal aria-label="Đóng">×</button>
+      <p class="eyebrow">Yêu cầu hỗ trợ</p>
+      <h2 id="helpTitle">Tôi đang cần hỗ trợ</h2>
+      <p>Yêu cầu sẽ được chuyển sang trạng thái chờ xác minh trước khi công khai trên bản đồ.</p>
+      <button class="btn btn-primary full" type="button" data-close-modal data-view-jump="needs">Mở form đăng nhu cầu</button>
+    </div>
+  </div>
+
+  <div class="modal" id="confirmModal" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+      <button class="modal-close" type="button" data-close-modal aria-label="Đóng">×</button>
+      <p class="eyebrow">Xác nhận</p>
+      <h2 id="confirmTitle">Gửi xác nhận nhận báo cáo?</h2>
+      <p>Hệ thống sẽ đánh dấu người đóng góp đã nhận được thông tin về hành trình và tác động của khoản hỗ trợ.</p>
+      <div class="form-actions">
+        <button class="btn btn-ghost" type="button" data-close-modal>Hủy</button>
+        <button class="btn btn-primary" type="button" id="confirmReport">Xác nhận</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
